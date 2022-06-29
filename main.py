@@ -15,63 +15,59 @@ if __name__ == '__main__':
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
 
-# composite.py
+#Decorator
 
-from abc import abstractmethod
+def div(a,b):
+    print(a/b)
 
+div(5,10)
 
-class Commodity:
-    @abstractmethod
-    def get_price(self):
-        pass
+def smart_div(func):
+    def inner(a,b):
+        if a < b :
+            a,b = b ,a
+            return func(a,b)
+    return inner
 
+div = smart_div(div)
+div(5,10)
 
-class Product(Commodity):
-    def __init__(self, price):
-        self.price = price
+# decorator_func_py
+def entry_exit(func):
+    def wrapped_func():
+        print(f"Entering {func.__name__}")
+        func()
+        print(f"Exiting {func.__name__}")
 
-    def get_price(self):
-        return self.price
-
-
-class Box(Commodity):
-    def __init__(self):
-        self._children = []
-
-    def add(self, item: Commodity):
-        self._children.append(item)
-
-    def remove(self, item: Commodity):
-        self._children.remove(item)
-
-    def get_price(self):
-        price = 0
-        for child in self._children:
-            price += child.get_price()
-        return price
+    return wrapped_func
 
 
-# put some phones into a box
-iphone13 = Product(1300)
-pixel6 = Product(600)
+@entry_exit
+def my_func():
+    print("Inside my_func")
 
-phones = Box()
-phones.add(iphone13)
-phones.add(pixel6)
 
-# put some consoles into a box
-xbox = Product(300)
-ps5 = Product(800)
+my_func()
 
-consoles = Box()
-consoles.add(xbox)
-consoles.add(ps5)
 
-# put the boxes in a even bigger box
-moving_box = Box()
-moving_box.add(phones)
-moving_box.add(consoles)
+# decorator_class.py
 
-# calculate prices
-print(moving_box.get_price())
-print(phones.get_price())
+class EntryExit:
+    def __init__(self, func):
+        self.func = func
+
+    def __call__(self):
+        print(f"Entering {self.func.__name__}")
+        self.func()
+        print(f"Exiting {self.func.__name__}")
+
+
+entry_exit = EntryExit  # enforce PEP8 compliance. useful? debatable!
+
+
+@entry_exit
+def my_func():
+    print("Inside my_func")
+
+
+my_func()
